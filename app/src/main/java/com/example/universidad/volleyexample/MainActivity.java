@@ -1,5 +1,7 @@
 package com.example.universidad.volleyexample;
 
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -30,14 +32,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        JsonObjectRequest objectRequest = new JsonObjectRequest("http://api.kivaws.org/v1/loans/newest.json", null, new Response.Listener<JSONObject>() {
+        /*JsonObjectRequest objectRequest = new JsonObjectRequest("http://api.kivaws.org/v1/loans/newest.json", null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
                     JSONArray array = response.getJSONArray("loans");
                     JSONObject object = array.getJSONObject(0);
 
-                    ((TextView) findViewById(R.id.nameView)).setText(object.getString("name"));
+                    //((TextView) findViewById(R.id.)).setText(object.getString("name"));
                     //((TextView) findViewById(R.id.location)).setText(object.getString("location"));
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -49,6 +51,13 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("MainActivity", "Error: " + error.getMessage());
             }
         });
-        this.requestQueue.add(objectRequest);
+        this.requestQueue.add(objectRequest);*/
+
+        FragmentManager manager = getFragmentManager();
+        FragmentTransaction transaction = manager.beginTransaction();
+
+        LoanSummaryListFragment fragment = new LoanSummaryListFragment();
+        transaction.add(R.id.loan_summary_list_holder, fragment);
+        transaction.commit();
     }
 }
