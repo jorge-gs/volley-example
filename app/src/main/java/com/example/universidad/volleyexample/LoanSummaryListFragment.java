@@ -10,6 +10,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by universidad on 2/3/17.
  */
@@ -21,8 +26,12 @@ public class LoanSummaryListFragment extends Fragment {
 
     public static final String ARG_COLUMN_COUNT = "column-count";
 
-    public String[][] data;
+    private LoanSummaryAdapter adapter;
     private int mColumnCount = 1;
+
+    public void addLoan(JSONObject loan) {
+        this.adapter.addLoan(loan);
+    }
 
     public static LoanSummaryListFragment newInstance(int columnCount) {
         LoanSummaryListFragment fragment = new LoanSummaryListFragment();
@@ -43,6 +52,8 @@ public class LoanSummaryListFragment extends Fragment {
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
         }
+
+        this.adapter = new LoanSummaryAdapter();
     }
 
     @Override
@@ -57,7 +68,7 @@ public class LoanSummaryListFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new LoanSummaryAdapter(this.data));//MyloanRecyclerViewAdapter(DummyContent.ITEMS, mListener));
+            recyclerView.setAdapter(this.adapter);//MyloanRecyclerViewAdapter(DummyContent.ITEMS, mListener));
         }
 
         return view;

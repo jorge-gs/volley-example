@@ -7,12 +7,23 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by universidad on 2/3/17.
  */
 
 public class LoanSummaryAdapter extends RecyclerView.Adapter<LoanSummaryAdapter.ViewHolder> {
-    private String[][] data;
+    private List<JSONObject> loans = new ArrayList<JSONObject>();
+
+    public void addLoan(JSONObject loan) {
+        this.loans.add(loan);
+        this.notifyItemInserted(this.loans.size() - 1);
+    }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public TextView nameView;
@@ -28,8 +39,7 @@ public class LoanSummaryAdapter extends RecyclerView.Adapter<LoanSummaryAdapter.
         }
     }
 
-    public LoanSummaryAdapter(String[][] data) {
-        this.data = data;
+    public LoanSummaryAdapter() {
     }
 
     @Override
@@ -41,13 +51,19 @@ public class LoanSummaryAdapter extends RecyclerView.Adapter<LoanSummaryAdapter.
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        holder.nameView.setText(this.data[position][0]);
-        holder.amountView.setText(this.data[position][1]);
-        holder.useView.setText(this.data[position][2]);
+        try {
+            Log.d("LoanSummaryAdapter", "Hallo");
+            String country = this.loans.get(position).getJSONObject("location").getString("country");
+            holder.nameView.setText(this.loans.get(position).getString("name") + " - " + country);
+            holder.amountView.setText("$" + this.loans.get(position).getInt("loan_amount"));
+            holder.useView.setText(this.loans.get(position).getString("use"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public int getItemCount() {
-        return data.length;
+        return loans.size();
     }
 }
