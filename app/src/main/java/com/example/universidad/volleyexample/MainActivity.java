@@ -18,14 +18,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
-    RequestQueue requestQueue;
+    //RequestQueue requestQueue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        this.requestQueue = Volley.newRequestQueue(this);
+        //this.requestQueue = Volley.newRequestQueue(this);
     }
 
     @Override
@@ -44,14 +44,10 @@ public class MainActivity extends AppCompatActivity {
             public void onResponse(JSONObject response) {
                 try {
                     JSONArray array = response.getJSONArray("loans");
-                    //JSONObject object = array.getJSONObject(0);
 
-                    for (int i = 0; i < 10; i++) {
+                    for (int i = 0; i < array.length(); i++) {
                         fragment.addLoan((JSONObject) array.get(i));
                     }
-
-                    //((TextView) findViewById(R.id.)).setText(object.getString("name"));
-                    //((TextView) findViewById(R.id.location)).setText(object.getString("location"));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -62,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("MainActivity", "Error: " + error.getMessage());
             }
         });
-        this.requestQueue.add(objectRequest);
+        VolleySingleton.getInstance(this).getRequestQueue().add(objectRequest);
+        //this.requestQueue.add(objectRequest);
     }
 }

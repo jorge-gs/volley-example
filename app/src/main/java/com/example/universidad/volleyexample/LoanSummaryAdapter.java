@@ -1,5 +1,7 @@
 package com.example.universidad.volleyexample;
 
+import android.content.Intent;
+import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,6 +28,7 @@ public class LoanSummaryAdapter extends RecyclerView.Adapter<LoanSummaryAdapter.
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
+        //public View view;
         public TextView nameView;
         public TextView amountView;
         public TextView useView;
@@ -50,13 +53,21 @@ public class LoanSummaryAdapter extends RecyclerView.Adapter<LoanSummaryAdapter.
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(final ViewHolder holder, final int position) {
         try {
-            Log.d("LoanSummaryAdapter", "Hallo");
             String country = this.loans.get(position).getJSONObject("location").getString("country");
             holder.nameView.setText(this.loans.get(position).getString("name") + " - " + country);
             holder.amountView.setText("$" + this.loans.get(position).getInt("loan_amount"));
             holder.useView.setText(this.loans.get(position).getString("use"));
+
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(holder.itemView.getContext(), LoanDetailActivity.class);
+                    intent.putExtra("JSONContent", loans.get(position).toString());
+                    holder.itemView.getContext().startActivity(intent);
+                }
+            });
         } catch (JSONException e) {
             e.printStackTrace();
         }
