@@ -40,7 +40,6 @@ public class MainActivity extends AppCompatActivity implements LoanSummaryListFr
         super.onStart();
 
         if (this.listFragment == null) {
-
             FragmentManager manager = getFragmentManager();
             FragmentTransaction transaction = manager.beginTransaction();
 
@@ -96,14 +95,14 @@ public class MainActivity extends AppCompatActivity implements LoanSummaryListFr
                         listFragment.addLoan((JSONObject) array.get(i));
                     }
                 } catch (JSONException e) {
-                    Toast toast = Toast.makeText(MainActivity.this, "Could not read loans information", Toast.LENGTH_SHORT);
+                    Toast toast = Toast.makeText(MainActivity.this, R.string.read_loans_error, Toast.LENGTH_SHORT);
                     toast.show();
                 }
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast toast = Toast.makeText(MainActivity.this, "Could not fetch loans information", Toast.LENGTH_SHORT);
+                Toast toast = Toast.makeText(MainActivity.this, R.string.get_loans_error, Toast.LENGTH_SHORT);
                 toast.show();
             }
         });

@@ -69,14 +69,10 @@ public class LoanSummaryAdapter extends RecyclerView.Adapter<LoanSummaryAdapter.
                 @Override
                 public void onClick(View v) {
                     callback.onLoanSummaryListFragmentClick(position);
-
-                    /*Intent intent = new Intent(holder.itemView.getContext(), LoanDetailActivity.class);
-                    intent.putExtra("JSONContent", loans.get(position).toString());
-                    holder.itemView.getContext().startActivity(intent);*/
                 }
             });
         } catch (JSONException e) {
-            Toast.makeText(holder.itemView.getContext(), "Could not display loan summary", Toast.LENGTH_SHORT).show();
+            Toast.makeText(holder.itemView.getContext(), R.string.loan_summary_display_error, Toast.LENGTH_SHORT).show();
         }
     }
 

@@ -76,7 +76,7 @@ public class LoanDetailFragment extends Fragment {
             ((TextView) this.getActivity().findViewById(R.id.detailAmount)).setText("$" + json.getInt("loan_amount"));
             ((TextView) this.getActivity().findViewById(R.id.detailUse)).setText(json.getString("use"));
         } catch (Exception exception) {
-            displayError("Could not display loan information");
+            displayError(getString(R.string.loan_display_error));
         }
     }
 
@@ -99,14 +99,14 @@ public class LoanDetailFragment extends Fragment {
                             }
                         }
                     } catch (JSONException exception) {
-                        displayError("Could not process image");
+                        displayError(getString(R.string.image_processing_error));
                     }
                 }
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     //TODO: Display error message
-                    displayError("Could not fetch image");
+                    displayError(getString(R.string.get_image_error));
                 }
             });
 
