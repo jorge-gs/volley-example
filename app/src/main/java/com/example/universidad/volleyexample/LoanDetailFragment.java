@@ -58,9 +58,12 @@ public class LoanDetailFragment extends Fragment {
         Toolbar toolbar = (Toolbar) this.getActivity().findViewById(R.id.toolbar);
         ((AppCompatActivity) this.getActivity()).setSupportActionBar(toolbar);
 
-        ActionBar actionBar = ((AppCompatActivity) this.getActivity()).getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
+        MainActivity activity = (MainActivity) (getActivity() instanceof MainActivity ? getActivity() : null);
+        if (activity != null && !activity.isTablet) {
+            ActionBar actionBar = ((AppCompatActivity) this.getActivity()).getSupportActionBar();
+            if (actionBar != null) {
+                actionBar.setDisplayHomeAsUpEnabled(true);
+            }
         }
 
         try {
@@ -96,14 +99,14 @@ public class LoanDetailFragment extends Fragment {
                             }
                         }
                     } catch (JSONException exception) {
-                        displayError("Could not fetch image");
+                        displayError("Could not process image");
                     }
                 }
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     //TODO: Display error message
-                    Log.d("LoanDetailFragment", error.getMessage());
+                    displayError("Could not fetch image");
                 }
             });
 
@@ -114,7 +117,10 @@ public class LoanDetailFragment extends Fragment {
         pattern = pattern.replace("<size>", "400");
         pattern = pattern.replace("<id>", "" + id);
 
-        ((NetworkImageView) this.getActivity().findViewById(R.id.app_bar_image)).setImageUrl(pattern, VolleySingleton.getInstance(this.getActivity()).getImageLoader());
+        NetworkImageView imageView = (NetworkImageView) this.getActivity().findViewById(R.id.app_bar_image);
+        if (imageView != null) {
+            imageView.setImageUrl(pattern, VolleySingleton.getInstance(this.getActivity()).getImageLoader());
+        }
     }
 
     private void displayError(String message) {

@@ -6,6 +6,7 @@ import android.app.ListFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,23 +39,19 @@ public class MainActivity extends AppCompatActivity implements LoanSummaryListFr
     protected void onStart() {
         super.onStart();
 
-        FragmentManager manager = getFragmentManager();
-        FragmentTransaction transaction = manager.beginTransaction();
+        if (this.listFragment == null) {
 
+            FragmentManager manager = getFragmentManager();
+            FragmentTransaction transaction = manager.beginTransaction();
 
-        this.listFragment = new LoanSummaryListFragment();
-        this.listFragment.callback = this;
+            this.listFragment = new LoanSummaryListFragment();
+            this.listFragment.callback = this;
 
-        transaction.add(R.id.loan_summary_list_holder, this.listFragment);
+            transaction.replace(R.id.loan_summary_list_holder, this.listFragment);
+            transaction.commit();
 
-        this.requestList();
-
-        //if (this.isTablet) {
-            //LoanDetailFragment detailFragment = new LoanDetailFragment();
-            //transaction.add(R.id.loan_detail_holder, detailFragment);
-        //}
-
-        transaction.commit();
+            this.requestList();
+        }
     }
 
     public void onLoanSummaryListFragmentClick(int position) {
@@ -68,8 +65,7 @@ public class MainActivity extends AppCompatActivity implements LoanSummaryListFr
         detailFragment.setArguments(bundle);
 
         transaction.replace(this.isTablet ? R.id.loan_detail_holder : R.id.loan_summary_list_holder, detailFragment);
-
-        transaction.addToBackStack(null);
+        if (!this.isTablet) { transaction.addToBackStack(null); }
         transaction.commit();
 
         return;
@@ -81,6 +77,20 @@ public class MainActivity extends AppCompatActivity implements LoanSummaryListFr
             public void onResponse(JSONObject response) {
                 try {
                     JSONArray array = response.getJSONArray("loans");
+
+                    if (isTablet) {
+                        FragmentManager manager = getFragmentManager();
+                        FragmentTransaction transaction = manager.beginTransaction();
+
+                        Bundle bundle = new Bundle();
+                        bundle.putString("JSONContent", array.getJSONObject(0).toString());
+
+                        LoanDetailFragment detailFragment = new LoanDetailFragment();
+                        detailFragment.setArguments(bundle);
+
+                        transaction.replace(R.id.loan_detail_holder, detailFragment);
+                        transaction.commit();
+                    }
 
                     for (int i = 0; i < array.length(); i++) {
                         listFragment.addLoan((JSONObject) array.get(i));
@@ -98,5 +108,15 @@ public class MainActivity extends AppCompatActivity implements LoanSummaryListFr
             }
         });
         VolleySingleton.getInstance(this).addToRequestQueue(objectRequest);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+        if (!this.isTablet && item.getItemId() == android.R.id.home) {
+            getFragmentManager().popBackStack();
+
+            return  true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
