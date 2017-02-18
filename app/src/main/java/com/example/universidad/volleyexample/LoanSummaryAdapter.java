@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -20,7 +21,12 @@ import java.util.List;
  */
 
 public class LoanSummaryAdapter extends RecyclerView.Adapter<LoanSummaryAdapter.ViewHolder> {
-    private List<JSONObject> loans = new ArrayList<JSONObject>();
+    public List<JSONObject> loans = new ArrayList<JSONObject>();
+    private LoanSummaryListFragment.OnLoanSummaryListFragmentClickListener callback;
+
+    public void setCallback(LoanSummaryListFragment.OnLoanSummaryListFragmentClickListener callback) {
+        this.callback = callback;
+    }
 
     public void addLoan(JSONObject loan) {
         this.loans.add(loan);
@@ -28,7 +34,6 @@ public class LoanSummaryAdapter extends RecyclerView.Adapter<LoanSummaryAdapter.
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        //public View view;
         public TextView nameView;
         public TextView amountView;
         public TextView useView;
@@ -63,13 +68,15 @@ public class LoanSummaryAdapter extends RecyclerView.Adapter<LoanSummaryAdapter.
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = new Intent(holder.itemView.getContext(), LoanDetailActivity.class);
+                    callback.onLoanSummaryListFragmentClick(position);
+
+                    /*Intent intent = new Intent(holder.itemView.getContext(), LoanDetailActivity.class);
                     intent.putExtra("JSONContent", loans.get(position).toString());
-                    holder.itemView.getContext().startActivity(intent);
+                    holder.itemView.getContext().startActivity(intent);*/
                 }
             });
         } catch (JSONException e) {
-            e.printStackTrace();
+            Toast.makeText(holder.itemView.getContext(), "Could not display loan summary", Toast.LENGTH_SHORT).show();
         }
     }
 

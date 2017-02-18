@@ -2,10 +2,12 @@ package com.example.universidad.volleyexample;
 
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.app.ListFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -17,28 +19,63 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class MainActivity extends AppCompatActivity {
-    //RequestQueue requestQueue;
+public class MainActivity extends AppCompatActivity implements LoanSummaryListFragment.OnLoanSummaryListFragmentClickListener {
+    boolean isTablet = false;
+
+    LoanSummaryListFragment listFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //this.requestQueue = Volley.newRequestQueue(this);
+        if (findViewById(R.id.loan_detail_holder) != null) {
+            this.isTablet = true;
+        }
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
+    protected void onStart() {
+        super.onStart();
 
         FragmentManager manager = getFragmentManager();
         FragmentTransaction transaction = manager.beginTransaction();
 
-        final LoanSummaryListFragment fragment = new LoanSummaryListFragment();
-        transaction.add(R.id.loan_summary_list_holder, fragment);
+
+        this.listFragment = new LoanSummaryListFragment();
+        this.listFragment.callback = this;
+
+        transaction.add(R.id.loan_summary_list_holder, this.listFragment);
+
+        this.requestList();
+
+        //if (this.isTablet) {
+            //LoanDetailFragment detailFragment = new LoanDetailFragment();
+            //transaction.add(R.id.loan_detail_holder, detailFragment);
+        //}
+
+        transaction.commit();
+    }
+
+    public void onLoanSummaryListFragmentClick(int position) {
+        FragmentManager manager = getFragmentManager();
+        FragmentTransaction transaction = manager.beginTransaction();
+
+        Bundle bundle = new Bundle();
+        bundle.putString("JSONContent", this.listFragment.adapter.loans.get(position).toString());
+
+        LoanDetailFragment detailFragment = new LoanDetailFragment();
+        detailFragment.setArguments(bundle);
+
+        transaction.replace(this.isTablet ? R.id.loan_detail_holder : R.id.loan_summary_list_holder, detailFragment);
+
+        transaction.addToBackStack(null);
         transaction.commit();
 
+        return;
+    }
+
+    private void requestList() {
         JsonObjectRequest objectRequest = new JsonObjectRequest("http://api.kivaws.org/v1/loans/newest.json", null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
@@ -46,19 +83,20 @@ public class MainActivity extends AppCompatActivity {
                     JSONArray array = response.getJSONArray("loans");
 
                     for (int i = 0; i < array.length(); i++) {
-                        fragment.addLoan((JSONObject) array.get(i));
+                        listFragment.addLoan((JSONObject) array.get(i));
                     }
                 } catch (JSONException e) {
-                    e.printStackTrace();
+                    Toast toast = Toast.makeText(MainActivity.this, "Could not read loans information", Toast.LENGTH_SHORT);
+                    toast.show();
                 }
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.d("MainActivity", "Error: " + error.getMessage());
+                Toast toast = Toast.makeText(MainActivity.this, "Could not fetch loans information", Toast.LENGTH_SHORT);
+                toast.show();
             }
         });
-        VolleySingleton.getInstance(this).getRequestQueue().add(objectRequest);
-        //this.requestQueue.add(objectRequest);
+        VolleySingleton.getInstance(this).addToRequestQueue(objectRequest);
     }
 }
