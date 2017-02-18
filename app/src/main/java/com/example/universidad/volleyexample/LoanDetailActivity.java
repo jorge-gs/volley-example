@@ -1,6 +1,8 @@
 package com.example.universidad.volleyexample;
 
 import android.app.Activity;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.ActionBar;
@@ -25,7 +27,28 @@ public class LoanDetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_loan_detail);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+
+        Intent intent = this.getIntent();
+        if (intent != null && intent.hasExtra("JSONContent")) {
+            //TODO: Pass JSON info
+
+            FragmentManager manager = this.getFragmentManager();
+            FragmentTransaction transaction = manager.beginTransaction();
+
+            Bundle bundle = new Bundle();
+            bundle.putString("JSONContent", intent.getStringExtra("JSONContent"));
+
+            LoanDetailFragment fragment = new LoanDetailFragment();
+            fragment.setArguments(bundle);
+
+            transaction.add(R.id.loan_detail_holder, fragment);
+            //transaction.addToBackStack(null);
+            transaction.commit();
+        } else {
+            //TODO: display error
+        }
+
+        /*Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         this.setSupportActionBar(toolbar);
 
         ActionBar actionBar = this.getSupportActionBar();
@@ -78,17 +101,7 @@ public class LoanDetailActivity extends AppCompatActivity {
             }
         //} else {
           //  Log.d("LoanDetailFragment", "Should have some argument");
-        //}
-    }
-
-    private void loadImage(String pattern, int id) {
-        pattern = pattern.replace("<size>", "800");
-        pattern = pattern.replace("<id>", "" + id);
-
-
-        NetworkImageView imageView = (NetworkImageView) findViewById(R.id.app_bar_image);
-        imageView.setImageUrl(pattern, VolleySingleton.getInstance(this).getImageLoader());
-
+        //}*/
     }
 
     @Override
