@@ -52,21 +52,21 @@
                 android:text="Country"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/country"
+                android:id="@+id/detailCountry"
                 android:textAppearance="@android:style/TextAppearance.Material.Large" />
 
             <TextView
                 android:text="Amount"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/amount"
+                android:id="@+id/detailAmount"
                 android:textAppearance="@android:style/TextAppearance.Material.Medium" />
 
             <TextView
                 android:text="Use"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/use" />
+                android:id="@+id/detailUse" />
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
 

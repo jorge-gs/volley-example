@@ -72,9 +72,9 @@ public class LoanDetailFragment extends Fragment {
 
             this.requestImage();
 
-            ((TextView) this.getActivity().findViewById(R.id.country)).setText(json.getJSONObject("location").getString("country"));
-            ((TextView) this.getActivity().findViewById(R.id.amount)).setText("$" + json.getInt("loan_amount"));
-            ((TextView) this.getActivity().findViewById(R.id.use)).setText(json.getString("use"));
+            ((TextView) this.getActivity().findViewById(R.id.detailCountry)).setText(json.getJSONObject("location").getString("country"));
+            ((TextView) this.getActivity().findViewById(R.id.detailAmount)).setText("$" + json.getInt("loan_amount"));
+            ((TextView) this.getActivity().findViewById(R.id.detailUse)).setText(json.getString("use"));
         } catch (Exception exception) {
             displayError("Could not display loan information");
         }
