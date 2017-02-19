@@ -2,6 +2,8 @@ package com.example.universidad.volleyexample;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -14,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -35,52 +38,45 @@ public class LoanDetailFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        try {
+            String jsonString = getArguments().getString("JSONContent");
+            json = new JSONObject(jsonString);
+        } catch (Exception exeption) {
+            this.displayError("Could not display loan information");
+
+            Intent intent = new Intent(container.getContext(), MainActivity.class);
+            this.getActivity().navigateUpTo(intent);
+        }
+
         return inflater.inflate(R.layout.fragment_loan_detail, container, false);
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        String jsonString = getArguments().getString("JSONContent");
-        if (jsonString != null) {
-            try {
-                json = new JSONObject(jsonString);
-            } catch (JSONException exception) {
-                //TODO: Show error message
-            }
-        }
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
+    public void onStart() {
+        super.onStart();
 
         Toolbar toolbar = (Toolbar) this.getActivity().findViewById(R.id.toolbar);
         ((AppCompatActivity) this.getActivity()).setSupportActionBar(toolbar);
 
-        ActionBar actionBar = ((AppCompatActivity) this.getActivity()).getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
-        }
-
-        CollapsingToolbarLayout toolbarLayout = (CollapsingToolbarLayout) this.getActivity().findViewById(R.id.toolbar_layout);
-        if (toolbarLayout != null) {
-            try {
-                toolbarLayout.setTitle(json.getString("name"));
-            } catch (JSONException exception) {
-                //TODO: Show error message
+        MainActivity activity = (MainActivity) (getActivity() instanceof MainActivity ? getActivity() : null);
+        if (activity != null && !activity.isTablet) {
+            ActionBar actionBar = ((AppCompatActivity) this.getActivity()).getSupportActionBar();
+            if (actionBar != null) {
+                actionBar.setDisplayHomeAsUpEnabled(true);
             }
         }
 
         try {
+            CollapsingToolbarLayout toolbarLayout = (CollapsingToolbarLayout) this.getActivity().findViewById(R.id.toolbar_layout);
+            toolbarLayout.setTitle(json.getString("name"));
+
             this.requestImage();
 
-            ((TextView) this.getActivity().findViewById(R.id.country)).setText(json.getJSONObject("location").getString("country"));
-            ((TextView) this.getActivity().findViewById(R.id.amount)).setText("$" + json.getInt("loan_amount"));
-            ((TextView) this.getActivity().findViewById(R.id.use)).setText(json.getString("use"));
-        } catch (JSONException exception) {
-            //TODO: handle exception
+            ((TextView) this.getActivity().findViewById(R.id.detailCountry)).setText(json.getJSONObject("location").getString("country"));
+            ((TextView) this.getActivity().findViewById(R.id.detailAmount)).setText("$" + json.getInt("loan_amount"));
+            ((TextView) this.getActivity().findViewById(R.id.detailUse)).setText(json.getString("use"));
+        } catch (Exception exception) {
+            displayError(getString(R.string.loan_display_error));
         }
     }
 
@@ -103,14 +99,14 @@ public class LoanDetailFragment extends Fragment {
                             }
                         }
                     } catch (JSONException exception) {
-                        exception.printStackTrace();
+                        displayError(getString(R.string.image_processing_error));
                     }
                 }
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     //TODO: Display error message
-                    Log.d("LoanDetailFragment", error.getMessage());
+                    displayError(getString(R.string.get_image_error));
                 }
             });
 
@@ -121,7 +117,14 @@ public class LoanDetailFragment extends Fragment {
         pattern = pattern.replace("<size>", "400");
         pattern = pattern.replace("<id>", "" + id);
 
-        ((NetworkImageView) this.getActivity().findViewById(R.id.app_bar_image)).setImageUrl(pattern, VolleySingleton.getInstance(this.getActivity()).getImageLoader());
+        NetworkImageView imageView = (NetworkImageView) this.getActivity().findViewById(R.id.app_bar_image);
+        if (imageView != null) {
+            imageView.setImageUrl(pattern, VolleySingleton.getInstance(this.getActivity()).getImageLoader());
+        }
     }
 
+    private void displayError(String message) {
+        Toast toast = Toast.makeText(this.getActivity(), message, Toast.LENGTH_LONG);
+        toast.show();
+    }
 }
